@@ -26,9 +26,17 @@ class StatusUpdate:
         self.message = message
         self.timestamp = timestamp or datetime.now()
 
+
+
+def get_base_dir():
+    if getattr(sys, 'frozen', False):  # Exécuté via PyInstaller (.exe)
+        return os.path.dirname(sys.executable)
+    else:  # Exécuté en mode .py normal
+        return os.path.dirname(os.path.abspath(__file__))
+
 class AutoGitCommitter:
     def __init__(self, status_callback=None):
-        self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.script_dir = get_base_dir()
         self.config_file = os.path.join(self.script_dir, "config.json")
         self.log_file = os.path.join(self.script_dir, "git_commits.log")
         self.status_callback = status_callback
@@ -50,6 +58,8 @@ class AutoGitCommitter:
         
         # Charger ou créer la configuration
         self.config = self.load_config()
+
+        
     
     def notify_status(self, repo_name, status, message=""):
         """Notifie le changement de statut à l'interface"""
